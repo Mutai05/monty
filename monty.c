@@ -44,9 +44,6 @@ int main(int argc, char *argv[])
         {
             pall();
         }
-        // Add more opcode implementations here
-
-        // ...
     }
 
     fclose(file);

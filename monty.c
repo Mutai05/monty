@@ -3,22 +3,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-stack_t *stack;  // Global variable representing the top of the stack
+stack_t *stack;  /* Global variable representing the top of the stack */
 
 int main(int argc, char *argv[])
 {
-    // ...
+    FILE *file;
+    char opcode[256];
+    int value, line_number = 0;
 
-    FILE *file = fopen(argv[1], "r");
+    if (argc != 2)
+    {
+        fprintf(stderr, "USAGE: monty file\n");
+        return (EXIT_FAILURE);
+    }
+
+    file = fopen(argv[1], "r");
 
     if (file == NULL)
     {
         fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
         return (EXIT_FAILURE);
     }
-
-    char opcode[256];
-    int value, line_number = 0;
 
     while (fscanf(file, "%s", opcode) != EOF)
     {
@@ -44,7 +49,6 @@ int main(int argc, char *argv[])
         // ...
     }
 
-    // ...
-
+    fclose(file);
     return (EXIT_SUCCESS);
 }

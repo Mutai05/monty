@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define UNUSED(x) (void)(x)
-
 void push(int value, unsigned int line_number)
 {
-    UNUSED(line_number);
+    stack_t *new_node;
 
-    stack_t *new_node = malloc(sizeof(stack_t));
+    (void)line_number;  /* Mark line_number as unused */
+
+    new_node = malloc(sizeof(stack_t));
 
     if (new_node == NULL)
     {
@@ -24,4 +24,15 @@ void push(int value, unsigned int line_number)
         stack->prev = new_node;
 
     stack = new_node;
+}
+
+void pall(void)
+{
+    stack_t *current = stack;
+
+    while (current != NULL)
+    {
+        printf("%d\n", current->n);
+        current = current->next;
+    }
 }

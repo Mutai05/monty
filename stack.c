@@ -1,83 +1,102 @@
 #include "monty.h"
 
 /**
- * main - Entry point for the Monty interpreter
- * @ac: Number of arguments passed
- * @av: Array of arguments passed to the program
- * Return: Always returns 0 upon successful execution
+ * pall - Print all values on the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
+ * Return: Void
  */
-int main(int ac, char *av[])
+
+void pall(stack_t **stack, unsigned int line_num)
 {
-    stack_t *stack = NULL;
-    static char *string[1000] = {NULL};
-    int n = 0;
-    FILE *fd;
-    size_t bufsize = 1000;
+	stack_t *h = *stack;
+	(void)line_num;
 
-    if (ac != 2)
-    {
-        fprintf(stderr, "USE: Monty file\n");
-        exit(EXIT_FAILURE);
-    }
-    fd = fopen(av[1], "r");
-    if (fd == NULL)
-    {
-        fprintf(stderr, "Error: Cannot open file %s\n", av[1]);
-        exit(EXIT_FAILURE);
-    }
-
-    for (n = 0; getline(&(string[n]), &bufsize, fd) > 0; n++)
-        ;
-    execute(string, stack);
-    free_list(string);
-    fclose(fd);
-    return (0);
+	while (h)
+	{
+		printf("%d\n", h->n);
+		h = h->next;
+	}
 }
 
 /**
- * execute - Executes Monty opcodes
- * @string: Array containing the contents of the file
- * @stack: Pointer to the stack (doubly linked list)
- * Return: void
+ * push - Pushes an element to the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
+ * @n: variable
+ * Return: address of new element
  */
-void execute(char *string[], stack_t *stack)
+
+void push(stack_t **stack, unsigned int line_num, int n)
 {
-    int ln, n, i;
+	stack_t *new, *h = *stack;
 
-    instruction_t st[] = {
-        {"pall", pall},
-        {"pint", pint},
-        {"add", add},
-        {"swap", swap},
-        {"pop", pop},
-        {"n/a", NULL}};
+	if (stack == NULL)
+	{
+		fprintf(stderr, "L%d: usage: push integer", line_num);
+		exit(EXIT_FAILURE);
+	}
+	new = malloc(sizeof(stack_t));
+	if (new == NULL)
+		exit(EXIT_FAILURE);
+	new->prev = NULL;
+	new->n = n;
+	new->next = *stack;
+	if (*stack)
+		h->prev = new;
+	*stack = new;
+}
 
-    for (ln = 1, n = 0; string[n + 1]; n++, ln++)
-    {
-        if (_strcmp("push", string[n]))
-            push(&stack, ln, pushint(string[n], ln));
-        else if (_strcmp("nop", string[n]))
-            ;
-        else
-        {
-            i = 0;
-            while (!_strcmp(st[i].opcode, "n/a"))
-            {
-                if (_strcmp(st[i].opcode, string[n]))
-                {
-                    st[i].f(&stack, ln);
-                    break;
-                }
-                i++;
-            }
-            if (_strcmp(st[i].opcode, "n/a") && !_strcmp(string[n], "\n"))
-            {
-                fprintf(stderr, "L%u: Invalid instruction %s", ln, string[n]);
-                if (!nlfind(string[n]))
-                    fprintf(stderr, "\n");
-                exit(EXIT_FAILURE);
-            }
-        }
-    }
-    free_stack(stack);
+/**
+ * pop - Removes the top element of the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
+ * Return: Void
+ */
+
+void pop(stack_t **stack, unsigned int line_num)
+{
+	stack_t *h = *stack;
+
+	if (!(*stack))
+	{
+		fprintf(stderr, "L%u: can't pop an empty stack\n", line_num);
+		exit(EXIT_FAILURE);
+	}
+
+
+	if (h)
+	{
+		*stack = (h)->next;
+		free(h);
+	}
+}
+
+/**
+ * swap - Swaps the top two elements of the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
+ * Return: Void
+ */
+void swap(stack_t **stack, unsigned int line_num)
+{
+	stack_t *h = *stack, *ptr;
+
+	if ((*stack) == NULL || (*stack)->next == NULL)
+	{
+		fprintf(stderr, "L%u: can't swap, stack too short\n", line_num);
+		exit(EXIT_FAILURE);
+	}
+
+	if (h && h->next)
+	{
+		ptr = h->next;
+		if (ptr->next)
+			ptr->next->prev = h;
+		h->next = ptr->next;
+		ptr->prev = NULL;
+		ptr->next = h;
+		h->prev = ptr;
+		*stack = ptr;
+	}
 }

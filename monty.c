@@ -1,108 +1,102 @@
 #include "monty.h"
 
 /**
- * print_stack - Outputs all values in the stack
- * @stack: Pointer to the head of the stack
- * @line_num: Line number in the file
+ * pall - Print all values on the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
  * Return: Void
  */
-void print_stack(stack_t **stack, unsigned int line_num)
-{
-    stack_t *h = *stack;
-    (void)line_num;
 
-    /* Output all values in the stack */
-    while (h)
-    {
-        printf("%d\n", h->n);
-        h = h->next;
-    }
+void pall(stack_t **stack, unsigned int line_num)
+{
+	stack_t *h = *stack;
+	(void)line_num;
+
+	while (h)
+	{
+		printf("%d\n", h->n);
+		h = h->next;
+	}
 }
 
 /**
- * push_to_stack - Adds an element to the stack
- * @stack: Pointer to the head of the stack
- * @line_num: Line number in the file
- * @n: Value to be pushed
- * Return: Address of the new element
+ * push - Pushes an element to the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
+ * @n: variable
+ * Return: address of new element
  */
-void push_to_stack(stack_t **stack, unsigned int line_num, int n)
+
+void push(stack_t **stack, unsigned int line_num, int n)
 {
-    stack_t *new, *h = *stack;
+	stack_t *new, *h = *stack;
 
-    /* Validate if the stack is NULL */
-    if (stack == NULL)
-    {
-        fprintf(stderr, "L%d: USE: Push integer", line_num);
-        exit(EXIT_FAILURE);
-    }
-
-    /* Allocate memory for a new stack element */
-    new = malloc(sizeof(stack_t));
-    if (new == NULL)
-        exit(EXIT_FAILURE);
-
-    /* Initialize the new stack element */
-    new->prev = NULL;
-    new->n = n;
-    new->next = *stack;
-    if (*stack)
-        h->prev = new;
-    *stack = new;
+	if (stack == NULL)
+	{
+		fprintf(stderr, "L%d: usage: push integer", line_num);
+		exit(EXIT_FAILURE);
+	}
+	new = malloc(sizeof(stack_t));
+	if (new == NULL)
+		exit(EXIT_FAILURE);
+	new->prev = NULL;
+	new->n = n;
+	new->next = *stack;
+	if (*stack)
+		h->prev = new;
+	*stack = new;
 }
 
 /**
- * pop_from_stack - Removes the top element from the stack
- * @stack: Pointer to the head of the stack
- * @line_num: Line number in the file
+ * pop - Removes the top element of the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
  * Return: Void
  */
-void pop_from_stack(stack_t **stack, unsigned int line_num)
+
+void pop(stack_t **stack, unsigned int line_num)
 {
-    stack_t *h = *stack;
+	stack_t *h = *stack;
 
-    /* Check if the stack is empty */
-    if (!(*stack))
-    {
-        fprintf(stderr, "L%u: Cannot pop an empty stack\n", line_num);
-        exit(EXIT_FAILURE);
-    }
+	if (!(*stack))
+	{
+		fprintf(stderr, "L%u: can't pop an empty stack\n", line_num);
+		exit(EXIT_FAILURE);
+	}
 
-    /* Remove the top element from the stack */
-    if (h)
-    {
-        *stack = (h)->next;
-        free(h);
-    }
+
+	if (h)
+	{
+		*stack = (h)->next;
+		free(h);
+	}
 }
 
 /**
- * swap_stack_elements - Swaps the top two elements in the stack
- * @stack: Pointer to the head of the stack
- * @line_num: Line number in the file
+ * swap - Swaps the top two elements of the stack
+ * @stack: pointer to head of stack
+ * @line_num: file's line number
  * Return: Void
  */
-void swap_stack_elements(stack_t **stack, unsigned int line_num)
+void swap(stack_t **stack, unsigned int line_num)
 {
-    stack_t *h = *stack, *ptr;
+	stack_t *h = *stack, *ptr;
 
-    /* Check if the stack has fewer than two elements */
-    if ((*stack) == NULL || (*stack)->next == NULL)
-    {
-        fprintf(stderr, "L%u: Cannot swap, stack too short\n", line_num);
-        exit(EXIT_FAILURE);
-    }
+	if ((*stack) == NULL || (*stack)->next == NULL)
+	{
+		fprintf(stderr, "L%u: can't swap, stack too short\n", line_num);
+		exit(EXIT_FAILURE);
+	}
 
-    /* Swap the top two elements in the stack */
-    if (h && h->next)
-    {
-        ptr = h->next;
-        if (ptr->next)
-            ptr->next->prev = h;
-        h->next = ptr->next;
-        ptr->prev = NULL;
-        ptr->next = h;
-        h->prev = ptr;
-        *stack = ptr;
-    }
+	if (h && h->next)
+	{
+		ptr = h->next;
+		if (ptr->next)
+			ptr->next->prev = h;
+		h->next = ptr->next;
+		ptr->prev = NULL;
+		ptr->next = h;
+		h->prev = ptr;
+		*stack = ptr;
+	}
 }

@@ -1,65 +1,83 @@
 #include "monty.h"
-#include <stdio.h>
-#include <stdlib.h>
 
-void push(int value, unsigned int line_number)
+/**
+ * main - Entry point for the Monty interpreter
+ * @ac: Number of arguments passed
+ * @av: Array of arguments passed to the program
+ * Return: Always returns 0 upon successful execution
+ */
+int main(int ac, char *av[])
 {
-    stack_t *new_node;
+    stack_t *stack = NULL;
+    static char *string[1000] = {NULL};
+    int n = 0;
+    FILE *fd;
+    size_t bufsize = 1000;
 
-    (void)line_number;  /* Mark line_number as unused */
-
-    new_node = malloc(sizeof(stack_t));
-
-    if (new_node == NULL)
+    if (ac != 2)
     {
-        fprintf(stderr, "Error: malloc failed\n");
+        fprintf(stderr, "USE: Monty file\n");
+        exit(EXIT_FAILURE);
+    }
+    fd = fopen(av[1], "r");
+    if (fd == NULL)
+    {
+        fprintf(stderr, "Error: Cannot open file %s\n", av[1]);
         exit(EXIT_FAILURE);
     }
 
-    new_node->n = value;
-    new_node->prev = NULL;
-    new_node->next = stack;
-
-    if (stack != NULL)
-        stack->prev = new_node;
-
-    stack = new_node;
+    for (n = 0; getline(&(string[n]), &bufsize, fd) > 0; n++)
+        ;
+    execute(string, stack);
+    free_list(string);
+    fclose(fd);
+    return (0);
 }
 
-void pall(void)
+/**
+ * execute - Executes Monty opcodes
+ * @string: Array containing the contents of the file
+ * @stack: Pointer to the stack (doubly linked list)
+ * Return: void
+ */
+void execute(char *string[], stack_t *stack)
 {
-    stack_t *current = stack;
+    int ln, n, i;
 
-    while (current != NULL)
+    instruction_t st[] = {
+        {"pall", pall},
+        {"pint", pint},
+        {"add", add},
+        {"swap", swap},
+        {"pop", pop},
+        {"n/a", NULL}};
+
+    for (ln = 1, n = 0; string[n + 1]; n++, ln++)
     {
-        printf("%d\n", current->n);
-        current = current->next;
+        if (_strcmp("push", string[n]))
+            push(&stack, ln, pushint(string[n], ln));
+        else if (_strcmp("nop", string[n]))
+            ;
+        else
+        {
+            i = 0;
+            while (!_strcmp(st[i].opcode, "n/a"))
+            {
+                if (_strcmp(st[i].opcode, string[n]))
+                {
+                    st[i].f(&stack, ln);
+                    break;
+                }
+                i++;
+            }
+            if (_strcmp(st[i].opcode, "n/a") && !_strcmp(string[n], "\n"))
+            {
+                fprintf(stderr, "L%u: Invalid instruction %s", ln, string[n]);
+                if (!nlfind(string[n]))
+                    fprintf(stderr, "\n");
+                exit(EXIT_FAILURE);
+            }
+        }
     }
-}
-
-void pop(void)
-{
-    if (stack != NULL)
-    {
-        stack_t *temp = stack;
-        stack = stack->next;
-
-        if (stack != NULL)
-            stack->prev = NULL;
-
-        free(temp);
-    }
-}
-
-void swap(void)
-{
-    if (stack == NULL || stack->next == NULL)
-    {
-        fprintf(stderr, "L%d: can't swap, stack too short\n", line_number);
-        exit(EXIT_FAILURE);
-    }
-
-    int temp = stack->n;
-    stack->n = stack->next->n;
-    stack->next->n = temp;
+    free_stack(stack);
 }

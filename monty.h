@@ -21,6 +21,6 @@ extern stack_t *stack;
 void push(int value, unsigned int line_number);
 void pall(void);
 void pop(void);
-
+void swap(void);
 
 #endif /* MONTY_H */

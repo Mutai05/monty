@@ -36,3 +36,17 @@ void pall(void)
         current = current->next;
     }
 }
+
+void pop(void)
+{
+    if (stack != NULL)
+    {
+        stack_t *temp = stack;
+        stack = stack->next;
+
+        if (stack != NULL)
+            stack->prev = NULL;
+
+        free(temp);
+    }
+}

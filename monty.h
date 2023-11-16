@@ -20,5 +20,7 @@ extern stack_t *stack;
 /* Function prototypes */
 void push(int value, unsigned int line_number);
 void pall(void);
+void pop(void);
+
 
 #endif /* MONTY_H */

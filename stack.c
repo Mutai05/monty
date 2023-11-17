@@ -1,11 +1,12 @@
 #include "monty.h"
+
 /**
- * f_stack - prints the top
- * @head: stack head
- * @counter: line_number
- * Return: no return
-*/
-void f_stack(stack_t **head, unsigned int counter)
+ * function_stack - Changes the list's behavior to stack mode (LIFO).
+ * @head: Pointer to the stack head
+ * @counter: Line number
+ * Return: No return value
+ */
+void function_stack(stack_t **head, unsigned int counter)
 {
 	(void)head;
 	(void)counter;
